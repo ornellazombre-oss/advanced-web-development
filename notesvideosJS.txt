@@ -1,0 +1,179 @@
+Video 1
+The first video was showing us what we will do during this series of videos, and we also see all the teachers who will teach us during this episode.
+Video 2
+With Burke Holland, what I get is that JavaScript is a powerful language and the most used in the world. Everyone can use it to do whatever they want. 
+No need to compile it, it is a dynamic language. We have to be careful because JavaScript is different from Java.
+Video 3
+This part we learn about JavaScript on the client and JavaScript on the server.
+JavaScript on the client runs in the user’s browser to make our page interactive.
+JavaScript on the server runs on a server by using Node.js, made for management like save, delete.
+Video 4
+With Yohan Lasora we talked about Visual Studio Code it’s  for writing our code. It’s free and open source.
+Useful extensions:Prettier, ES6,….
+Nodejs  execute JavaScript code also outside of the browser.
+Video 5
+He explained to us how install some extensions, especially Node.js and npm.
+Video 6
+With Burke Holland we wrote our first note ,not mine but what he was talking about especially how to display in the terminal a phrase.
+We always use single quotes or double quotes, otherwise if we don’t want quotes we can use variables and put  %s or ${} in the code 
+Video 7
+We talked about comments that is ignoring by java. It can be used to remind something or to explain or comment a block of code you don’t want to run for the moment.
+We have two types: 
+single line Just for one line and we put // to start.
+and multi-line to start/*  and to end*/ for many lines as we want.
+He gave us some tips to comment with special keyboard shortcut.
+We don’t need to comment all our code because it will be too long and difficult to read we have to make our code easier and give our variables names that correspond to what we are doing with.
+Video 8
+The second time he showed us examples of using comments and how to search our comments, like a demonstration of what he explained in the previous videos.
+Video 9
+Aaron Powell talked about 3 types of variables and how to declare a variable.
+var is flexible but dangerous.
+const doesn’t change, use it most.
+let when it is in a loop.
+Video 10
+How to use those variables:
+var = it doesn't have restrictions and can work even if you can create two var with the same name.
+let: when you use it, we can change the variable but we can’t use it after {} if let is inside.
+const: we cannot change it after.
+Video 11
+With Jasmine Greenway said that String concatenation is the fact of combining two or more strings:
+Be careful when you are using the “+” operator for concatenation.
+You usually have to add spacing.
+Video 12
+she demonstrated how it’s working. We can put “ ” with spacing or add space at the end of the word.
+Video 13
+With Jasmine Greenway we talked about Template literal. She explained template literal and its different benefits. 
+She also compare concatenation operator and Template literal.
+Video 14
+We use backticks, we don’t need formatting.
+If there are spaces after the end of the phrase, it will print all.That is what I retained after her template literal demonstration.
+Video 15
+Aaron Powell talked about Type of data. We have simple types and special types because for a variable we can reassign another type after but we have 2 checking types:
+type of returns the type(string or number)and instead of to find if if variable is realable to a class or other.
+
+Video 16
+He demonstrated how to find the type of variables and how to use instead of because it is quite confusing.
+Video 17
+With Jasmine Greenway we learn Performing Math: she showed some basics of Math operations that we can use.
+She said also we have the Math object if we want more sophisticated objet.
+Video 18
+Jasmine Greenway started by showing us some simple basic math like addition, subtraction, and after that incrementations.
+At the end, some Math objects like: Math.sqrt(number) for square root.
+Video19
+Jasmine Greenway talked about Number and string:
+How to convert between string and number.You can’t convert a non numerical string to a number.
+For int numbers: parseInt.
+For float numbers: parseFloat.
+Video 20
+Jasmine Greenway demonstrated how it works, why some things don’t work, and some special cases like hexadecimal, or using parseInt with a float number.
+We can convert all numbers.
+Video 21
+With Jasmine Greenway we talked about unintended behavior:
+We have errors when something goes wrong in our code, like incorrect syntax.An exception is when and where this error happens.
+Errors can be dangerous so you have to find and catch it and correct it.
+Video 22
+She showed us how to catch an error and make the program not stop even if we have an error.
+Video 23
+With Christopher Harrison we learned Dates.
+He demonstrated that dates start 1 Jan since 1970 also months start by 0.
+How to get a year, minutes, etc.
+Video 24
+With Christopher Harrison we saw how to use dates in JavaScript.We can get today’s date or a specific date. We can also set the date as we want. And so one.
+Video 25
+Christopher Harrison we talked again about equality.
+== compares without type.
+=== checks the value and also the data type.
+Same for != and !== for non-equal operators. We also talked if statement.
+Video 26
+Christopher Harrison first showed that for if statements it’s better to use triple equal instead of double for better results.
+If we have only one line of code, we don’t need {} ,we can write it in one line, but it can make mistakes. We have another way to write if statements shortly with ? and :.
+Video 27
+CH: We learned that we can combine comparisons (and, or) and how to use it in if statements.
+In switch case statements, you have to always put a break otherwise the code will be blocked.
+Video 28
+Christopher Harrison showed in his demonstration how to use boolean in if statements with ! to make a reverse.
+He also showed how && and || work in JavaScript.
+If we don't put break in a switch case, when one result is true it will execute all the other ones even if they are false ,that’s why it’s important to use break.
+Video 29
+Jasmine Greenway defined an array that is a list where we can put values and they can be for different types. Each value has a unique index allowing us to find them.
+We can also know the length of an array, but we can also predefine the length.
+Video 30
+She showed us how to create an array with square brackets or with the Array object and how to find the length of an array.
+Video 31
+We talked about how we can add data in an array ,we can do it when we create the array or after, but we have to be careful with index and also with the length.
+The index starts at 0.
+If you want to know how many indexes you can have with a fixed-length array, it is length - 1.
+Video 32
+She showed how we create an array and add values inside, how to insert after creating the array.
+Video 33
+Here we saw how to manipulate arrays:
+adding values at the end or at the top of the list, removing them, and with concatenation we can join 2 arrays into one.
+Video 34
+She demonstrated how it is written.
+push = to add at the end
+pop = to remove at the end
+unshift = to add at the top
+shift = to remove at the 
+Video 35
+We learned that loops help execute code multiple times, and in JavaScript we have 3 common types of loops: while, for, and for-of.
+For while, you have to make sure that the condition will change so the loop can stop.
+For loop is almost the same as while loop but written in one line.
+For of loop: we don’t need to worry about the index.
+Video 36
+He demonstrated how each loop works and for While it’s used when we don’t really know how many times we want the code to execute.
+For loop, we need to declare the index separately we can do on one line.
+For of we can find the structure on vscode with tabulation.
+Video 37
+With Nitya Narasimhan we defined a function. It’s a block of code that you can use again and again, and it’s easy to maintain your code.
+You have to give them names that correspond on what they are doing.
+You can create with “functions” and invoke them when you need them in your code.
+Video 38
+To declare a function, you have to put the function + simple name () + {} then write the code inside.
+For the invocation, just call the name, we don’t use special characters for the name.
+If you want to provide data, you can have parameters for a personal result.
+The return allows us to send the result of the code or something to the main code.
+Video 39
+With Aaron Powell we learned that an arrow function is a shorter way to write functions.
+A single-line function will always have a return, but if it's multiple lines we have to write the return statement.
+Video 40
+Aaron Powell demonstrated how arrow functions work when we have to write return or not, if we want to write a single-line arrow function or a multiple-line one.
+Video 41
+With Nitya Narasimhan talked about JSON as a text format that is easy to read and understand.It is a common language between apps and websites. 
+We can transform JSON into JavaScript or JavaScript into JSON.
+What I understood is that it is a kind of library.
+Video 42
+I learned that JSON has two methods:
+stringify gives the value in string format
+ parse does the inverse; we get the object 
+Video 43
+With Nitya Narasimhan we learned how to create an object.
+We learned that properties are object variables and methods are object functions.
+We also saw how “this” works in the object.
+Video 44 
+We saw how to create objects with constructors, how to call properties our methodswith a dot notation bracket notation.
+You can take the notation you want and “this” value at call time can represent different values present in the object.
+Video 45
+Christopher Harrison talked about asynchronous programming.
+It's like some tasks that take time to end and you don’t want your code to stop for this.
+That’s why we use callbacks and promises.
+Callback = a function that is inside another function and will be called after a certain time.
+Promise = an object that can respond now, later, or never if there is an error.
+Video 46
+Christopher Harrison showed us how to write a promise and how to get positive or negative responses after setTimeout is done.
+Video 47
+Christopher Harrison talked about async/await. It is common in many languages and more simple, and it also returns a promise.
+Video 48
+Christopher Harrison explained that where you can use promises, you can also use async/await, and you can only use await in an async function.
+He also talked about the importance of await in the logic.
+Video 49
+Yohan Lasora defined a package as a collection of code that can be reused in your project.
+You can find it on npm.
+It’s important because it allow us to concentrate into to what you want to do don’t mind a bout the simple way.
+Video 50
+Yohan Lasora showed us how to install a package to quickly code in java.
+Video 51
+Christopher Harrison thanked us for watching this series and encouraged us to go to the next episode, but also practice what we learned during this series.
+
+These are what I retained from watching all the 51 videos. I also made some research because it became more difficult to understand at the end but was very useful  
+for me to know de basics of Javascript, thank you.
+

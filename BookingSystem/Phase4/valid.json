@@ -1,0 +1,8 @@
+﻿{
+  "action": "create",
+  "resourceName": "Camera",
+  "resourceDescription": "High quality DSLR camera available for rental.",
+  "resourceAvailable": true,
+  "resourcePrice": 25,
+  "resourcePriceUnit": "day"
+}

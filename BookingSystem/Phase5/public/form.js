@@ -13,7 +13,8 @@ function getFormMessageEl() {
 
 /**
  * Show a success/error/info message in the UI.
- * type: "success" | "error" | "info"
+ * type: "success" | "error" 
+ * (Teacher wants all errors in red → "info" removed for errors)
  */
 function showFormMessage(type, message) {
   const el = getFormMessageEl();
@@ -23,13 +24,11 @@ function showFormMessage(type, message) {
   el.className = "mt-6 rounded-2xl border px-4 py-3 text-sm whitespace-pre-line";
   el.classList.remove("hidden");
 
-  // Type-specific styling (Tailwind-like utility classes)
+  // Type-specific styling
   if (type === "success") {
     el.classList.add("border-emerald-200", "bg-emerald-50", "text-emerald-900");
-  } else if (type === "info") {
-    el.classList.add("border-amber-200", "bg-amber-50", "text-amber-900");
   } else {
-    // error (default)
+    // 🔴 ERROR (default) – ALL errors must be red, as teacher wants
     el.classList.add("border-rose-200", "bg-rose-50", "text-rose-900");
   }
 
@@ -44,7 +43,7 @@ function clearFormMessage() {
   el.classList.add("hidden");
 }
 
-// Timestamp (for logging if you want to keep console logs)
+// Timestamp (for logging)
 function timestamp() {
   const now = new Date();
   return now.toISOString().replace("T", " ").replace("Z", "");
@@ -52,7 +51,6 @@ function timestamp() {
 
 /**
  * Try to read JSON from the response.
- * If JSON is not available, return a best-effort object including raw text.
  */
 async function readResponseBody(response) {
   const contentType = response.headers.get("content-type") || "";
@@ -65,7 +63,6 @@ async function readResponseBody(response) {
     }
   }
 
-  // Fallback: read as text
   const text = await response.text().catch(() => "");
   try {
     return JSON.parse(text);
@@ -75,12 +72,11 @@ async function readResponseBody(response) {
 }
 
 /**
- * Build a readable message for field validation errors returned by the API.
- * Expected format: { errors: [ { field, msg }, ... ] }
+ * Build a readable message for field validation errors
  */
 function buildValidationMessage(errors) {
   if (!Array.isArray(errors) || errors.length === 0) {
-    return "Validation failed. Please check your input fields.";
+    return "Some fields are invalid. Please check your input.";
   }
 
   const lines = errors.map((e) => {
@@ -89,7 +85,7 @@ function buildValidationMessage(errors) {
     return `• ${field}: ${msg}`;
   });
 
-  return `Your request was blocked by server-side validation:\n\n${lines.join("\n")}`;
+  return `The following fields contain errors:\n\n${lines.join("\n")}`;
 }
 
 /**
@@ -138,36 +134,36 @@ async function onSubmit(event) {
       body: JSON.stringify(payload),
     });
 
-    // Try to parse body for both success and error cases
     const body = await readResponseBody(response);
 
     // -----------------------------------------
-    // Error handling by HTTP status
+    // Error handling
     // -----------------------------------------
     if (!response.ok) {
-      // 400 = server-side validation errors
+
+      // 400 validation
       if (response.status === 400) {
         const msg = buildValidationMessage(body?.errors);
         showFormMessage(
           "error",
-          `❌ Invalid input.\n\n${msg}\n\n➡️ Please fix the highlighted fields and try again.`
+          `❌ Invalid input.\n\n${msg}\n\nPlease fix the highlighted fields and try again.`
         );
         return;
       }
 
-      // 409 = duplicate resourceName
+      // 409 duplicate
       if (response.status === 409) {
         const existingName = payload.resourceName || "this name";
         const extra = body?.details ? `\n\nDetails: ${body.details}` : "";
         showFormMessage(
-          "info",
-          `⚠️ This resource already exists: “${existingName}”.\n\n` +
-            `Try a different name, or check the list to confirm it’s already there.${extra}`
+          "error",    // 🔴 changed from "info" → teacher wants all errors RED
+          `❌ This resource already exists: “${existingName}”.\n\n` +
+            `Try a different name or check the list.${extra}`
         );
         return;
       }
 
-      // Other errors (500, 404, etc.)
+      // Other server errors
       showFormMessage("error", buildGenericErrorMessage(response.status, body));
       return;
     }
@@ -176,21 +172,15 @@ async function onSubmit(event) {
     // Success handling (201)
     // -----------------------------------------
     const createdName = body?.data?.name ?? payload.resourceName ?? "";
-    const createdAtIso = body?.data?.created_at || "";
-    const createdAt = createdAtIso ? createdAtIso.replace("T", " ").replace("Z", "") : "";
-    const dbId = body?.data?.id ?? "";
 
+    // Teacher does NOT want ID or timestamp in success message
     showFormMessage(
       "success",
-      `✅ Resource “${createdName}” added successfully.\n` +
-        (createdAt ? `📅 Created at: ${createdAt}\n` : "") +
-        (dbId ? `🆔 ID: ${dbId}` : "")
+      `✅ Resource “${createdName}” was created successfully.`
     );
 
-    // Optional: reset the form after success
     $("resourceForm")?.reset();
 
-    // Notify UI layer (if you have list refresh elsewhere)
     if (typeof window.onResourceActionSuccess === "function") {
       window.onResourceActionSuccess({
         action: actionValue,
@@ -199,8 +189,7 @@ async function onSubmit(event) {
     }
 
   } catch (err) {
-    // Network errors, CORS, server unreachable, etc.
     console.error(`[${timestamp()}] POST /api/resources failed:`, err);
-    showFormMessage("error", "Network error: Could not reach the server. Check your environment and try again.");
+    showFormMessage("error", "Network error: Could not reach the server.");
   }
 }

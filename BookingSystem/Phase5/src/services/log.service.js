@@ -20,7 +20,7 @@ export async function logEvent({
   }
 
   const sql = `
-    INSERT INTO logs (actor_user_id, message, entity_type, entity_id)
+    INSERT INTO booking_log (actor_user_id, message, entity_type, entity_id)
     VALUES ($1, $2, $3, $4)
   `;
 

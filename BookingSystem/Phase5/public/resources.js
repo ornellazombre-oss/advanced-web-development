@@ -120,7 +120,7 @@ function createResourceNameInput(container) {
   input.id = "resourceName";
   input.name = "resourceName";
   input.type = "text";
-  input.placeholder = "e.g., Meeting Room A";
+  input.placeholder = "e.g: Meeting Room A";
 
   // Base Tailwind styling (single source of truth)
   input.className = `
@@ -152,7 +152,7 @@ function createResourceDescriptionArea(container) {
   textarea.name = "resourceDescription";
   textarea.rows = 5;
   textarea.placeholder =
-    "Describe location, capacity, included equipment, or any usage notes…";
+    "Describe your ressource";
 
   // Base Tailwind styling (single source of truth)
   textarea.className = `

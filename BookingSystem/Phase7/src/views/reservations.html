@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservations | Booking System</title>
+
+    <!-- Tailwind CDN + Brand config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: "#e10e49",
+                            light: "#ffffff",
+                            dark: "#1e1e1e",
+                            blue: "#263f6a",
+                            green: "#284e36",
+                            orange: "#e37222",
+                            rose: "#c24d52",
+                        }
+                    },
+                    boxShadow: {
+                        soft: "0 8px 40px rgba(0, 0, 0, 0.45)",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen flex flex-col bg-brand-light text-brand-dark">
+
+    <!-- ============================================================
+         HEADER
+    ============================================================ -->
+    <header class="sticky top-0 z-40 bg-brand-dark text-white shadow-soft">
+        <div class="mx-auto max-w-7xl px-6">
+            <div class="flex h-16 items-center justify-between">
+                <a href="/" class="flex items-center gap-3 flex-1">
+                    <img src="logo.svg" alt="Booking System" class="h-10 w-10">
+                    <div class="leading-tight">
+                        <span class="block text-sm font-semibold">Booking System</span>
+                        <span class="block text-xs text-white/70">Secure resource booking</span>
+                    </div>
+                </a>
+                <nav class="flex items-center gap-3">
+                    <a href="/resources" data-auth="user"
+                        class="res-link rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10 w-40 text-center">
+                        Resources
+                    </a>
+                    <a href="/reservations" data-auth="user"
+                        class="res-link rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10 w-40 text-center cursor-not-allowed pointer-events-none">
+                        Reservations
+                    </a>
+                    <a href="/register" data-auth="guest"
+                        class="auth-link rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10 w-40 text-center">
+                        Register
+                    </a>
+                    <a href="/login" data-auth="guest"
+                        class="auth-link rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10 w-40 text-center">
+                        Sign in
+                    </a>
+                    <button onclick="logout()" data-auth="user"
+                        class="auth-link hidden rounded-xl bg-brand-primary px-4 py-2 text-sm font-semibold text-white w-40 text-center">
+                        Sign out
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================
+         MAIN
+    ============================================================ -->
+    <main id="mainContent" class="mx-auto max-w-7xl px-6 flex-grow">
+
+        <!-- Auth guard banner (shown when not logged in) -->
+        <div id="authGuard" class="hidden py-12">
+            <div class="rounded-3xl bg-white p-8 shadow-soft text-center">
+                <p class="text-lg font-semibold text-brand-primary">Authentication required</p>
+                <p class="mt-2 text-sm text-black/60">Please <a href="/login" class="underline hover:text-brand-primary">sign in</a> to access reservations.</p>
+            </div>
+        </div>
+
+        <!-- Main page content (shown only when authenticated) -->
+        <div id="pageContent" class="hidden">
+
+            <!-- Page header -->
+            <section class="py-12">
+                <div class="rounded-3xl bg-white p-8 shadow-soft">
+                    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <span class="inline-flex items-center gap-2 rounded-full bg-brand-primary/10 px-4 py-1 text-sm font-semibold text-brand-primary">
+                                Reservation management
+                            </span>
+                            <h1 class="mt-4 text-3xl font-semibold leading-tight">Reservations</h1>
+                            <p class="mt-2 max-w-2xl text-sm text-black/70">
+                                Create, view, update, and delete reservations. Fill in the form to add a new reservation or click an existing one to edit it.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Form + List -->
+            <section class="pb-16">
+                <div class="grid gap-8 lg:grid-cols-12">
+
+                    <!-- LEFT: Form -->
+                    <div class="lg:col-span-8">
+                        <div class="rounded-3xl bg-white p-8 shadow-soft">
+                            <h2 class="text-xl font-semibold">Reservation form</h2>
+                            <p class="mt-1 text-sm text-black/60">
+                                All fields are required. Fill in the details below. Use <strong>Create</strong> for new items, <strong>Update</strong> for existing ones, and <strong>Delete</strong> to remove.
+                            </p>
+
+                            <!-- Feedback message -->
+                            <div id="formMessage" class="hidden mt-6 rounded-2xl border px-4 py-3 text-sm" role="alert"></div>
+
+                            <form class="mt-8 space-y-6" id="reservationForm" novalidate>
+                                <input type="hidden" id="reservationId" value="" />
+
+                                <!-- Resource ID + User ID -->
+                                <div class="grid gap-6 lg:grid-cols-2">
+                                    <div>
+                                        <label for="resourceId" class="block text-sm font-semibold">Resource ID</label>
+                                        <input id="resourceId" name="resourceId" type="number" placeholder="e.g. 1" min="1"
+                                            class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out" />
+                                        <p class="mt-2 text-xs text-black/50">ID of the resource to reserve.</p>
+                                    </div>
+                                    <div>
+                                        <label for="userId" class="block text-sm font-semibold">User ID</label>
+                                        <input id="userId" name="userId" type="number" placeholder="e.g. 1" min="1"
+                                            class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out" />
+                                        <p class="mt-2 text-xs text-black/50">ID of the user making the reservation.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Start time + End time -->
+                                <div class="grid gap-6 lg:grid-cols-2">
+                                    <div>
+                                        <label for="startTime" class="block text-sm font-semibold">Start time</label>
+                                        <input id="startTime" name="startTime" type="datetime-local"
+                                            class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out" />
+                                        <p class="mt-2 text-xs text-black/50">When the reservation starts.</p>
+                                    </div>
+                                    <div>
+                                        <label for="endTime" class="block text-sm font-semibold">End time</label>
+                                        <input id="endTime" name="endTime" type="datetime-local"
+                                            class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out" />
+                                        <p class="mt-2 text-xs text-black/50">When the reservation ends.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Note -->
+                                <div>
+                                    <label for="note" class="block text-sm font-semibold">Note</label>
+                                    <input id="note" name="note" type="text" placeholder="e.g. Team meeting"
+                                        class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out" />
+                                    <p class="mt-2 text-xs text-black/50">Optional short description or reason for the reservation.</p>
+                                </div>
+
+                                <!-- Status -->
+                                <div>
+                                    <label for="status" class="block text-sm font-semibold">Status</label>
+                                    <select id="status" name="status"
+                                        class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out">
+                                        <option value="active">active</option>
+                                        <option value="cancelled">cancelled</option>
+                                        <option value="completed">completed</option>
+                                    </select>
+                                    <p class="mt-2 text-xs text-black/50">Current status of the reservation.</p>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="mt-8 grid gap-4 grid-cols-1 sm:grid-flow-col sm:auto-cols-fr">
+                                    <button type="button" id="btnCreate"
+                                        class="rounded-2xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white hover:bg-brand-dark transition-all duration-200 ease-out">
+                                        Create
+                                    </button>
+                                    <button type="button" id="btnUpdate"
+                                        class="hidden rounded-2xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white hover:bg-brand-dark transition-all duration-200 ease-out">
+                                        Update
+                                    </button>
+                                    <button type="button" id="btnDelete"
+                                        class="hidden rounded-2xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white hover:bg-brand-dark transition-all duration-200 ease-out">
+                                        Delete
+                                    </button>
+                                    <button type="button" id="btnClear"
+                                        class="rounded-2xl border border-black/20 px-4 py-3 text-sm font-semibold text-black/70 hover:bg-black/5 transition-all duration-200 ease-out">
+                                        Clear
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: List + Tips -->
+                    <aside class="lg:col-span-4 space-y-6">
+
+                        <!-- Reservation list -->
+                        <div class="rounded-3xl bg-white p-6 shadow-soft">
+                            <div class="flex items-center justify-between gap-3">
+                                <h3 class="font-semibold">Reservation list</h3>
+                            </div>
+                            <p class="mt-2 text-xs text-black/50">Click an item to view, edit or delete it.</p>
+                            <div id="reservationList" class="mt-4 space-y-3">
+                                <!-- JS renders items here -->
+                            </div>
+                        </div>
+
+                        <!-- Info card -->
+                        <div class="rounded-3xl bg-white p-6 shadow-soft">
+                            <h3 class="font-semibold">Good reservation details</h3>
+                            <ul class="mt-4 space-y-2 text-sm text-black/70">
+                                <li>• Correct resource and user IDs</li>
+                                <li>• Start time before end time</li>
+                                <li>• Clear note describing the purpose</li>
+                                <li>• Accurate status reflecting reality</li>
+                            </ul>
+                            <a href="/"
+                                class="mt-5 inline-block w-full rounded-2xl bg-brand-primary px-4 py-3 text-center text-sm text-white hover:bg-brand-dark/80 transition-all duration-200 ease-out">
+                                Back to homepage
+                            </a>
+                        </div>
+
+                    </aside>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ============================================================
+         FOOTER
+    ============================================================ -->
+    <footer class="bg-brand-dark text-white">
+        <div class="mx-auto max-w-7xl px-6 py-10">
+            <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="logo.svg" alt="Booking System" class="h-8 w-8 opacity-90">
+                    <div class="leading-tight">
+                        <p class="text-sm font-semibold">Booking System</p>
+                        <p class="text-xs text-white/60">Secure resource booking</p>
+                    </div>
+                </div>
+                <nav class="flex items-center gap-3 text-sm text-white/70">
+                    <a href="/privacypolicy" class="rounded-full px-3 py-1 hover:bg-white/10 hover:text-white transition cursor-not-allowed pointer-events-none">Privacy</a>
+                    <span class="text-white/30">|</span>
+                    <a href="/terms" class="rounded-full px-3 py-1 hover:bg-white/10 hover:text-white transition cursor-not-allowed pointer-events-none">Terms</a>
+                    <span class="text-white/30">|</span>
+                    <a href="/cookiepolicy" class="rounded-full px-3 py-1 hover:bg-white/10 hover:text-white transition cursor-not-allowed pointer-events-none">Cookies</a>
+                </nav>
+            </div>
+            <div class="mt-8 border-t border-white/10 pt-4 text-xs text-white/50">
+                © <span id="year"></span> Ville Heikkiniemi. All rights reserved. Source code licensed under the MIT License.
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================================
+         JAVASCRIPT
+    ============================================================ -->
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // ── Auth helpers ──────────────────────────────────────────
+        function getToken() {
+           return "cookie-token";
+     }
+
+        function logout() {
+           fetch("/api/auth/logout", {
+             method: "POST",
+             credentials: "include"
+           }).finally(() => {
+              window.location.href = "/login";
+           });
+        }
+window.logout = logout;
+
+        // ── Auth guard: show page or redirect ────────────────────
+        function checkAuth() {
+            const token = getToken();
+            if (!token) {
+                // Not logged in → show auth guard banner, hide page
+                document.getElementById("authGuard").classList.remove("hidden");
+                document.getElementById("pageContent").classList.add("hidden");
+                return false;
+            }
+            document.getElementById("authGuard").classList.add("hidden");
+            document.getElementById("pageContent").classList.remove("hidden");
+            return true;
+        }
+
+        // ── Nav: show/hide auth-dependent links ──────────────────
+        function updateNav() {
+            const token = getToken();
+            document.querySelectorAll("[data-auth='guest']").forEach(el => {
+                el.style.display = token ? "none" : "";
+            });
+            document.querySelectorAll("[data-auth='user']").forEach(el => {
+                el.style.display = token ? "" : "none";
+            });
+            // Show sign-out button
+            document.querySelectorAll(".auth-link[onclick]").forEach(el => {
+                el.classList.toggle("hidden", !token);
+            });
+        }
+
+        // ── Message helper ────────────────────────────────────────
+        function showMessage(text, type = "success") {
+            const el = document.getElementById("formMessage");
+            el.textContent = text;
+            el.className = "mt-6 rounded-2xl border px-4 py-3 text-sm";
+            if (type === "success") {
+                el.classList.add("border-brand-green/30", "bg-brand-green/10", "text-brand-green");
+            } else {
+                el.classList.add("border-brand-primary/30", "bg-brand-primary/10", "text-brand-primary");
+            }
+            el.classList.remove("hidden");
+            setTimeout(() => el.classList.add("hidden"), 4000);
+        }
+
+        // ── Reset form to "create" mode ───────────────────────────
+        function resetForm() {
+            document.getElementById("reservationId").value = "";
+            document.getElementById("resourceId").value = "";
+            document.getElementById("userId").value = "";
+            document.getElementById("startTime").value = "";
+            document.getElementById("endTime").value = "";
+            document.getElementById("note").value = "";
+            document.getElementById("status").value = "active";
+            document.getElementById("btnCreate").classList.remove("hidden");
+            document.getElementById("btnUpdate").classList.add("hidden");
+            document.getElementById("btnDelete").classList.add("hidden");
+        }
+
+        // ── Populate form from a reservation object ───────────────
+        function fillForm(r) {
+            document.getElementById("reservationId").value = r.id;
+            document.getElementById("resourceId").value = r.resource_id;
+            document.getElementById("userId").value = r.user_id;
+            // Convert ISO string to datetime-local format
+            document.getElementById("startTime").value = r.start_time ? r.start_time.slice(0, 16) : "";
+            document.getElementById("endTime").value = r.end_time ? r.end_time.slice(0, 16) : "";
+            document.getElementById("note").value = r.note || "";
+            document.getElementById("status").value = r.status || "active";
+            document.getElementById("btnCreate").classList.add("hidden");
+            document.getElementById("btnUpdate").classList.remove("hidden");
+            document.getElementById("btnDelete").classList.remove("hidden");
+        }
+
+        // ── Auth headers ──────────────────────────────────────────
+        function authHeaders() {
+            const token = getToken();
+            return {
+                "Content-Type": "application/json",
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
+            };
+        }
+
+        // ── Format datetime for display ───────────────────────────
+        function fmt(isoStr) {
+            if (!isoStr) return "—";
+            return new Date(isoStr).toLocaleString("fi-FI", { dateStyle: "short", timeStyle: "short" });
+        }
+
+        // ── Render reservation list ───────────────────────────────
+        function renderList(reservations) {
+            const list = document.getElementById("reservationList");
+            if (!reservations.length) {
+                list.innerHTML = `<p class="text-sm text-black/50 text-center py-4">No reservations yet.</p>`;
+                return;
+            }
+            list.innerHTML = reservations.map(r => `
+                <div
+                    onclick="selectReservation(${r.id})"
+                    class="cursor-pointer rounded-2xl border border-black/10 px-4 py-3 hover:border-brand-primary/40 hover:bg-brand-primary/5 transition-all duration-150">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-sm font-semibold truncate">
+                            #${r.id} · ${r.resource_name || 'Resource ' + r.resource_id}
+                        </span>
+                        <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold
+                            ${r.status === 'active' ? 'bg-brand-green/10 text-brand-green' :
+                              r.status === 'cancelled' ? 'bg-brand-primary/10 text-brand-primary' :
+                              'bg-black/10 text-black/60'}">
+                            ${r.status}
+                        </span>
+                    </div>
+                    <p class="mt-1 text-xs text-black/50">${fmt(r.start_time)} → ${fmt(r.end_time)}</p>
+                    <p class="mt-0.5 text-xs text-black/40">${r.user_email || 'User ' + r.user_id}</p>
+                    ${r.note ? `<p class="mt-0.5 text-xs text-black/50 italic">${r.note}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // ── Load all reservations ─────────────────────────────────
+        async function loadReservations() {
+            try {
+                const res = await fetch("/api/reservations", { headers: authHeaders() });
+                const json = await res.json();
+                if (json.ok) renderList(json.data);
+                else showMessage(json.error || "Failed to load reservations.", "error");
+            } catch (err) {
+                showMessage("Network error loading reservations.", "error");
+            }
+        }
+
+        // ── Select one reservation → fill form ───────────────────
+        async function selectReservation(id) {
+            try {
+                const res = await fetch(`/api/reservations/${id}`, { headers: authHeaders() });
+                const json = await res.json();
+                if (json.ok) fillForm(json.data);
+                else showMessage(json.error || "Failed to load reservation.", "error");
+            } catch (err) {
+                showMessage("Network error.", "error");
+            }
+        }
+        window.selectReservation = selectReservation;
+
+        // ── Collect form values ───────────────────────────────────
+        function formValues() {
+            return {
+                resourceId: document.getElementById("resourceId").value,
+                userId: document.getElementById("userId").value,
+                startTime: new Date(document.getElementById("startTime").value).toISOString(),
+                endTime: new Date(document.getElementById("endTime").value).toISOString(),
+                note: document.getElementById("note").value,
+                status: document.getElementById("status").value,
+            };
+        }
+
+        // ── CREATE ────────────────────────────────────────────────
+        document.getElementById("btnCreate").addEventListener("click", async () => {
+            try {
+                const res = await fetch("/api/reservations", {
+                    method: "POST",
+                    headers: authHeaders(),
+                    body: JSON.stringify(formValues()),
+                });
+                const json = await res.json();
+                if (res.status === 201) {
+                    showMessage("Reservation created successfully!", "success");
+                    resetForm();
+                    loadReservations();
+                } else {
+                    showMessage(json.error || "Failed to create reservation.", "error");
+                }
+            } catch (err) {
+                showMessage("Network error.", "error");
+            }
+        });
+
+        // ── UPDATE ────────────────────────────────────────────────
+        document.getElementById("btnUpdate").addEventListener("click", async () => {
+            const id = document.getElementById("reservationId").value;
+            if (!id) return;
+            try {
+                const res = await fetch(`/api/reservations/${id}`, {
+                    method: "PUT",
+                    headers: authHeaders(),
+                    body: JSON.stringify(formValues()),
+                });
+                const json = await res.json();
+                if (json.ok) {
+                    showMessage("Reservation updated successfully!", "success");
+                    resetForm();
+                    loadReservations();
+                } else {
+                    showMessage(json.error || "Failed to update reservation.", "error");
+                }
+            } catch (err) {
+                showMessage("Network error.", "error");
+            }
+        });
+
+        // ── DELETE ────────────────────────────────────────────────
+        document.getElementById("btnDelete").addEventListener("click", async () => {
+            const id = document.getElementById("reservationId").value;
+            if (!id) return;
+            if (!confirm(`Delete reservation #${id}? This cannot be undone.`)) return;
+            try {
+                const res = await fetch(`/api/reservations/${id}`, {
+                    method: "DELETE",
+                    headers: authHeaders(),
+                });
+                if (res.status === 204) {
+                    showMessage("Reservation deleted.", "success");
+                    resetForm();
+                    loadReservations();
+                } else {
+                    const json = await res.json();
+                    showMessage(json.error || "Failed to delete reservation.", "error");
+                }
+            } catch (err) {
+                showMessage("Network error.", "error");
+            }
+        });
+
+        // ── CLEAR ─────────────────────────────────────────────────
+        document.getElementById("btnClear").addEventListener("click", resetForm);
+
+        // ── Init ──────────────────────────────────────────────────
+        updateNav();
+        if (checkAuth()) {
+            loadReservations();
+        }
+    </script>
+
+</body>
+</html>

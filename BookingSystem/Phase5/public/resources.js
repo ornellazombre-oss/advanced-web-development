@@ -144,7 +144,7 @@ function isResourceNameValid(value) {
   return lengthValid && charactersValid;
 }
 
-function createResourceDescriptionArea(container) {
+function createResourceDescriptionArea(container) {s
   const textarea = document.createElement("textarea");
 
   // Core attributes

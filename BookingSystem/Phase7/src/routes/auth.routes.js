@@ -179,3 +179,7 @@ router.get("/me", (req, res) => {
 });
 
 export default router;
+router.post("/logout", (req, res) => {
+  res.clearCookie("token");   
+  return res.json({ ok: true });
+});

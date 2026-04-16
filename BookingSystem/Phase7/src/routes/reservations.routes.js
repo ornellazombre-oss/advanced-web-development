@@ -9,12 +9,13 @@ const router = express.Router();
    CREATE
    POST /api/reservations
 ===================================================== */
+
+
 router.post("/", async (req, res) => {
   const actorUserId = null;
 
   const {
     resourceId,
-    userId,
     startTime,
     endTime,
     note,
@@ -31,7 +32,6 @@ router.post("/", async (req, res) => {
 
     const params = [
       Number(resourceId),
-      Number(userId),
       startTime,
       endTime,
       note || null,
@@ -145,13 +145,13 @@ router.put("/:id", async (req, res) => {
 
   const {
     resourceId,
-    userId,
     startTime,
     endTime,
     note,
     status
   } = req.body;
-
+  const userId = req.user.id;
+  
   try {
 
     const sql = `

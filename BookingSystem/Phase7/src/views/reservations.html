@@ -125,19 +125,16 @@
                                 <input type="hidden" id="reservationId" value="" />
 
                                 <!-- Resource ID + User ID -->
+                                 
                                 <div class="grid gap-6 lg:grid-cols-2">
                                     <div>
-                                        <label for="resourceId" class="block text-sm font-semibold">Resource ID</label>
-                                        <input id="resourceId" name="resourceId" type="number" placeholder="e.g. 1" min="1"
-                                            class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out" />
-                                        <p class="mt-2 text-xs text-black/50">ID of the resource to reserve.</p>
+                                       <label for="resourceId" class="block text-sm font-semibold">Resource</label>
+                                           <select id="resourceId" name="resourceId"
+                                               class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none
+                                                      focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out">
+                                           </select>
                                     </div>
-                                    <div>
-                                        <label for="userId" class="block text-sm font-semibold">User ID</label>
-                                        <input id="userId" name="userId" type="number" placeholder="e.g. 1" min="1"
-                                            class="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/30 transition-all duration-200 ease-out" />
-                                        <p class="mt-2 text-xs text-black/50">ID of the user making the reservation.</p>
-                                    </div>
+                                    
                                 </div>
 
                                 <!-- Start time + End time -->
@@ -324,12 +321,37 @@ window.logout = logout;
             el.classList.remove("hidden");
             setTimeout(() => el.classList.add("hidden"), 4000);
         }
+       
+async function loadResourceOptions() {
+    try {
+        const res = await fetch("/api/resources", {
+            method: "GET",
+            credentials: "include"   
+        });
 
-        // ── Reset form to "create" mode ───────────────────────────
+        const body = await res.json();
+        if (!body.ok) return;
+
+        const select = document.getElementById("resourceId");
+        select.innerHTML = "";
+
+        body.data.forEach(resource => {
+            const option = document.createElement("option");
+            option.value = resource.id;
+            option.textContent = resource.name;
+            select.appendChild(option);
+        });
+
+    } catch (err) {
+        console.error("Error loading resources:", err);
+    }
+}
+   
+// ── Reset form to "create" mode ───────────────────────────
         function resetForm() {
             document.getElementById("reservationId").value = "";
             document.getElementById("resourceId").value = "";
-            document.getElementById("userId").value = "";
+
             document.getElementById("startTime").value = "";
             document.getElementById("endTime").value = "";
             document.getElementById("note").value = "";
@@ -343,7 +365,7 @@ window.logout = logout;
         function fillForm(r) {
             document.getElementById("reservationId").value = r.id;
             document.getElementById("resourceId").value = r.resource_id;
-            document.getElementById("userId").value = r.user_id;
+          
             // Convert ISO string to datetime-local format
             document.getElementById("startTime").value = r.start_time ? r.start_time.slice(0, 16) : "";
             document.getElementById("endTime").value = r.end_time ? r.end_time.slice(0, 16) : "";
@@ -424,15 +446,14 @@ window.logout = logout;
         window.selectReservation = selectReservation;
 
         // ── Collect form values ───────────────────────────────────
-        function formValues() {
-            return {
-                resourceId: document.getElementById("resourceId").value,
-                userId: document.getElementById("userId").value,
-                startTime: new Date(document.getElementById("startTime").value).toISOString(),
-                endTime: new Date(document.getElementById("endTime").value).toISOString(),
-                note: document.getElementById("note").value,
-                status: document.getElementById("status").value,
-            };
+       function formValues() {
+          return {
+              resourceId: document.getElementById("resourceId").value,
+              startTime: new Date(document.getElementById("startTime").value).toISOString(),
+              endTime: new Date(document.getElementById("endTime").value).toISOString(),
+              note: document.getElementById("note").value,
+              status: document.getElementById("status").value,
+           };
         }
 
         // ── CREATE ────────────────────────────────────────────────
@@ -510,6 +531,10 @@ window.logout = logout;
         if (checkAuth()) {
             loadReservations();
         }
+            document.addEventListener("DOMContentLoaded", () => {
+    loadResourceOptions();
+});  
+
     </script>
 
 </body>

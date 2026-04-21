@@ -1,24 +1,19 @@
-import './App.css';
-import Header from './components/Header';
-import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import Contact from './components/Contact';
-import Footer from './components/Footer';   // ✅ REQUIRED
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Header from './components/Header'
+import PortfolioPage from './pages/PortfolioPage'
+import FormPage from './pages/FormPage'
+import './App.css'
 
 function App() {
   return (
-    <>
+    <BrowserRouter>
       <Header />
-      <Hero />
-      <About />
-      <Skills />
-      <Projects />
-      <Contact />
-      <Footer />       {/* ✅ THIS LINE WAS MISSING */}
-    </>
-  );
+      <Routes>
+        <Route path="/" element={<PortfolioPage />} />
+        <Route path="/form" element={<FormPage />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App

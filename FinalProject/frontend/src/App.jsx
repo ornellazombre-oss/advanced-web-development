@@ -1,0 +1,21 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Header from './components/Header'
+import PortfolioPage from './pages/PortfolioPage'
+import FormPage from './pages/FormPage'
+import SubmissionsPage from './pages/SubmissionsPage'
+import './App.css'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Header />
+      <Routes>
+        <Route path="/" element={<PortfolioPage />} />
+        <Route path="/form" element={<FormPage />} />
+        <Route path="/submissions" element={<SubmissionsPage />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App
